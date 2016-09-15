@@ -6,7 +6,7 @@ let Q = DispatchQueue.main
 func setupListenSocket(port p: Int = 1337) -> Int32 {
   var address = Glibc.sockaddr_in()
   address.sin_addr = in_addr(s_addr: 0)
-  address.sin_port = in_port_t(htons(p))
+  address.sin_port = in_port_t(p.bigEndian)
 
   // MANUAL ACCEPT
   let lfd = Glibc.socket(Glibc.AF_INET, Int32(Glibc.SOCK_STREAM.rawValue), 0)
@@ -31,7 +31,7 @@ func setupListenSocket(port p: Int = 1337) -> Int32 {
   return lfd
 }
 
-func doAccept() -> Int32 {
+func doAccept(socket lfd: Int32) -> Int32 {
   var baddr    = Glibc.sockaddr_in()
   var baddrlen = socklen_t(MemoryLayout<sockaddr_in>.stride)
 
@@ -51,7 +51,7 @@ let lfd          = setupListenSocket(port: 1337)
 let listenSource = DispatchSource.makeReadSource(fileDescriptor: lfd, queue: Q)
 
 listenSource.setEventHandler {
-  let newFD = doAccept()
+  let newFD = doAccept(socket: lfd)
  
   channel = DispatchIO(type: DispatchIO.StreamType.stream,
                        fileDescriptor: newFD, 
