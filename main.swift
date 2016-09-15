@@ -3,10 +3,10 @@ import Dispatch
 
 let Q = DispatchQueue.main
 
-func setupListenSocket(port p: Int = 1337) -> Int32 {
+func setupListenSocket(port p: Int) -> Int32 {
   var address = Glibc.sockaddr_in()
   address.sin_addr = in_addr(s_addr: 0)
-  address.sin_port = in_port_t(p.bigEndian)
+  address.sin_port = in_port_t(p).bigEndian
 
   // MANUAL ACCEPT
   let lfd = Glibc.socket(Glibc.AF_INET, Int32(Glibc.SOCK_STREAM.rawValue), 0)
